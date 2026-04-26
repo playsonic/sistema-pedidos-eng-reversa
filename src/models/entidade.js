@@ -1,11 +1,33 @@
 class Produto {
-    static #tabelaPrecos = {
-        "pizzap": 5,
-        "pizzam": 7,
-        "pizzag": 4,
-        "suco": 6,
-        "refrigerante": 3,
-        "sanduiche": 5
+    static #cardapio = {
+        "pizzap":{
+            "calabresa": 10,
+            "quatroqueijos": 10,
+            "peperonecheese": 12
+        },
+        "pizzam": {
+            "calabresa": 12,
+            "quatroqueijos": 12,
+            "peperonecheese": 14
+        },
+        "pizzag": {
+            "calabresa": 14,
+            "quatroqueijos": 14,
+            "peperonecheese": 16
+        },
+        "suco": {
+            "uva": 2,
+            "laranja": 3, 
+        },
+        "refrigerante": {
+            "lata": 3,
+            "1litro": 5
+
+        },
+        "sanduiche": {
+            "misto": 7,
+            "ovo": 8
+        }
 
     };
 
