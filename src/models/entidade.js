@@ -1,81 +1,78 @@
-class Produto {
+export class Produto {
     static #cardapio = {
-        "pizzap":{
-            "calabresa": 10,
-            "quatroqueijos": 10,
-            "peperonecheese": 12
+        "pizzap": 
+        { 
+            "calabresa": 10, 
+            "quatroqueijos": 10, 
+            "peperonecheese": 12 
         },
-        "pizzam": {
-            "calabresa": 12,
-            "quatroqueijos": 12,
-            "peperonecheese": 14
+        "pizzam": 
+        { 
+            "calabresa": 12, 
+            "quatroqueijos": 12, 
+            "peperonecheese": 14 
         },
-        "pizzag": {
-            "calabresa": 14,
-            "quatroqueijos": 14,
-            "peperonecheese": 16
+        "pizzag": 
+        { 
+            "calabresa": 14, 
+            "quatroqueijos": 14, 
+            "peperonecheese": 16 
         },
-        "suco": {
-            "uva": 2,
-            "laranja": 3, 
+        "suco": 
+        { 
+            "uva": 2, 
+            "laranja": 3 
         },
-        "refrigerante": {
-            "lata": 3,
-            "1litro": 5
-
-        },
-        "sanduiche": {
-            "misto": 7,
-            "ovo": 8
+        "refrigerante": 
+        { 
+            "lata": 3, 
+            "1litro": 5 },
+        "sanduiche": 
+        { 
+            "misto": 7, 
+            "ovo": 8 
         }
-
     };
 
-    static criarProduto(produto, quantidadeDigitada) {
+    static criarProduto(categoria, sabor, quantidadeDigitada) {
         const qtd = Number(quantidadeDigitada);
-        const nomeNormalizado = nome.toLowerCase();
+        const catNormalizada = categoria.toLowerCase();
+        const saborNormalizado = sabor.toLowerCase();
 
         if (!qtd || qtd <= 0) {
             throw new Error("Quantidade inválida. Digite um número maior que zero.");
         }
 
-        let precoVigente = catalago[produto.toLowerCase()] || 0;
-
-        if (precoVigente === 0) {
-            throw new Error("Produto inválido ou não cadastrado.");
+        if (!this.#cardapio[catNormalizada] || !this.#cardapio[catNormalizada][saborNormalizado]) {
+            throw new Error("Produto inválido ou não cadastrado no cardápio.");
         }
 
-        return new ItemPedido(produto, qtd, precoVigente);
+        let precoVigente = this.#cardapio[catNormalizada][saborNormalizado];
+
+        const nomeCompleto = `${categoria} ${sabor}`;
+
+        return new ItemPedido(nomeCompleto, qtd, precoVigente);
     }
 }
 
-class ItemPedido {
-    constructor(produto, quantidade) {
+export class ItemPedido {
+    constructor(nomeProduto, quantidade, precoUnitario) {
         this.produto = nomeProduto;
         this.qtd = Number(quantidade);
-        this.preco = Number(produto.preco);
-        this.subtotal = this.qtd * this.preco;
+        this.preco = Number(precoUnitario);
+        this.subtotal = this.qtd * this.preco; 
     }
-
-    
 }
 
-class Pedidos {
+export class Pedidos {
     constructor() {
-
-        if (Pedidos.instancia) {
-            return Pedidos.instancia;
-        }
         this.itens = [];
         this.total = 0;
-
-        Pedidos.instancia = this;
     }
 
     adicionarItem(novoItem) {
-
         this.itens.push(novoItem);
-        this.total += novoItem.subtotal
+        this.total += novoItem.subtotal;
     }
 
     removerUltimo() {
@@ -86,7 +83,6 @@ class Pedidos {
     }
 
     precoFinal() {
-
         let taxa = this.total * 0.05;
         let desconto = this.total;
 
@@ -97,12 +93,10 @@ class Pedidos {
         }
 
         return desconto + taxa;
-
     }
 
     limpar() {
         this.itens = [];
         this.total = 0;
     }
-
 }
