@@ -1,40 +1,84 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8">
-  <title>Pastelaria do Zé</title>
+  <title>Sistema de Pedidos</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div class="container">
-  <h1>🍴 Sistema de Pedidos</h1>
+  <div class="container">
+    <h1>🍴 Sistema de Pedidos</h1>
 
-  <div class="form">
-    <select id="produto">
-      <option value="pastel">Pastel</option>
-      <option value="caldo">Caldo</option>
-      <option value="refrigerante">Refrigerante</option>
-      <option value="suco">Suco</option>
-    </select>
+    <div class="form">
+      <select id="categoria" onchange="mostrarOpcoesCorretas()">
+        <option value="">Selecione o que deseja...</option>
+        <option value="pizzap">Pizza Pequena</option>
+        <option value="pizzam">Pizza Média</option>
+        <option value="pizzag">Pizza Grande</option>
+        <option value="suco">Suco</option>
+        <option value="refrigerante">Refrigerante</option>
+        <option value="sanduiche">Sanduíche</option>
+      </select>
+    
+      <div id="divPizza" class="escondido">
+        <select id="saboresPizza">
+          <option value="calabresa">Calabresa</option>
+          <option value="quatroqueijos">Quatro Queijos</option>
+          <option value="peperonecheese">Peperone com cream cheese</option>
+        </select>
+      </div>
+    
+      <div id="divSuco" class="escondido">
+        <select id="saboresSuco">
+          <option value="uva">Uva</option>
+          <option value="laranja">Laranja</option>
+        </select>
+      </div>
+    
+      <div id="divRefri" class="escondido">
+        <select id="tamanhoRefri">
+          <option value="lata">Lata</option>
+          <option value="1litro">1 Litro</option>
+        </select>
+      </div>
+    
+      <div id="divSanduiche" class="escondido">
+        <select id="saboresSanduiche">
+          <option value="misto">Misto</option>
+          <option value="ovo">Com Ovo</option>
+        </select>
+      </div>
+ 
 
-    <input type="number" id="qtd" placeholder="Quantidade">
+      <input type="number" id="qtd" placeholder="Quantidade">
 
-    <button onclick="adicionar()">Adicionar</button>
-    <button onclick="finalizar()">Finalizar Pedido</button>
+      <button onclick="clickAdicionarPedido()">Adicionar</button>
+    </div>
+
+    <hr>
+
+    <div class="form-finalizar">
+      <input type="text" id="numeroCliente" placeholder="WhatsApp (ex: 5511999999999)">
+
+      <button onclick="clickFinalizarPedido()">Finalizar Pedido</button>
+      <button onclick="clickRemoverUltimo()">Remover Último Item</button>
+    </div>
+
+    <div class="lista">
+      <h2>Itens no Carrinho</h2>
+      <ul id="lista"></ul>
+    </div>
+
+    <div class="total">
+      <h2>Total: R$ <span id="total">0.00</span></h2>
+    </div>
   </div>
 
-  <div class="lista">
-    <h2>Itens</h2>
-    <ul id="lista"></ul>
-  </div>
-
-  <div class="total">
-    <h2>Total: R$ <span id="total">0</span></h2>
-  </div>
-</div>
-
-<script src="script.js"></script>
+  <script src="view.js"></script>
 
 </body>
+
 </html>

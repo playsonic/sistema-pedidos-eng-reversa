@@ -43,3 +43,7 @@ button:hover {
   margin: 5px 0;
   padding: 5px;
 }
+
+.escondido {
+  display: none;
+}
