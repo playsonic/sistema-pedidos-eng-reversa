@@ -32,7 +32,6 @@ const mockResponse = () => {
     return res;
 };
 
-
 describe('Testes do PedidoController', () => {
 
     beforeEach(() => {
@@ -41,15 +40,16 @@ describe('Testes do PedidoController', () => {
     });
 
     describe('adicionarPedido()', () => {
-        test('Deve adicionar um produto e retornar status 201', () => {
-            const req = mockRequest({ produto: 'pizzap', quantidade: 2 });
+        test('Deve adicionar um produto com sabor e retornar status 201', () => {
+            const req = mockRequest({ produto: 'pizzap', sabor: 'calabresa', quantidade: 2 });
             const res = mockResponse();
 
-            Produto.criarProduto.mockReturnValue({ produto: 'pizzap padrão', qtd: 2, preco: 10 });
+            Produto.criarProduto.mockReturnValue({ produto: 'pizzap calabresa', qtd: 2, preco: 10 });
 
             adicionarPedido(req, res);
 
-            expect(Produto.criarProduto).toHaveBeenCalledWith('pizzap', 'padrão', 2);
+            // ATUALIZAÇÃO 2: Espera que a fábrica crie com o sabor enviado, em vez de "padrão"
+            expect(Produto.criarProduto).toHaveBeenCalledWith('pizzap', 'calabresa', 2);
             expect(services.adicionarPedido).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(201);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
@@ -58,10 +58,9 @@ describe('Testes do PedidoController', () => {
         });
 
         test('Deve retornar erro 400 se o Produto rejeitar a criação', () => {
-            const req = mockRequest({ produto: 'produto_invalido', quantidade: 0 });
+            const req = mockRequest({ produto: 'produto_invalido', sabor: 'inexistente', quantidade: 0 });
             const res = mockResponse();
 
-            // Simulamos o model disparando um erro
             Produto.criarProduto.mockImplementation(() => {
                 throw new Error("Quantidade inválida.");
             });
@@ -85,7 +84,7 @@ describe('Testes do PedidoController', () => {
             expect(WhatsappService.enviarMensagem).not.toHaveBeenCalled();
         });
 
-        test('Deve finalizar pedido, limpar carrinho e chamar Whatsapp se tiver itens', async () => {
+        test('Deve finalizar pedido, limpar carrinho e chamar Whatsapp para cliente e dono', async () => {
             const req = mockRequest({ numeroCliente: '5511999999999' });
             const res = mockResponse();
 
@@ -95,7 +94,9 @@ describe('Testes do PedidoController', () => {
             await finalizarPedido(req, res);
 
             expect(services.limparPedidos).toHaveBeenCalled();
-            expect(WhatsappService.enviarMensagem).toHaveBeenCalled();
+
+            expect(WhatsappService.enviarMensagem).toHaveBeenCalledTimes(2);
+
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith({
                 mensagem: "Pedido finalizado com sucesso!",
@@ -118,7 +119,7 @@ describe('Testes do PedidoController', () => {
             const req = mockRequest();
             const res = mockResponse();
 
-            services.pedidoAtual.itens = [{ produto: 'suco', qtd: 1 }];
+            services.pedidoAtual.itens = [{ produto: 'suco laranja', qtd: 1 }];
 
             removerUltimo(req, res);
 
@@ -135,14 +136,14 @@ describe('Testes do PedidoController', () => {
             const req = mockRequest();
             const res = mockResponse();
 
-            services.pedidoAtual.itens = [{ produto: 'suco', qtd: 1 }];
+            services.pedidoAtual.itens = [{ produto: 'suco laranja', qtd: 1 }];
             services.obterTotalFinal.mockReturnValue(2);
 
             buscarPedidoAtual(req, res);
 
             expect(res.status).toHaveBeenCalledWith(200);
             expect(res.json).toHaveBeenCalledWith({
-                itens: [{ produto: 'suco', qtd: 1 }],
+                itens: [{ produto: 'suco laranja', qtd: 1 }],
                 total: 2
             });
         });
