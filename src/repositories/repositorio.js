@@ -1,24 +1,32 @@
-import fs from 'fs';
-const CAMINHO_ARQUIVO = './src/data/pedidos.json';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url'; 
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const CAMINHO_ARQUIVO = path.resolve(__dirname, '..', 'data', 'pedidos.json');
 export class PedidoSalvar {
 
-    static salvarDados(dados) {
+    static async salvarDados(dados) {
         try {
             const jsonString = JSON.stringify(dados, null, 2);
-            fs.writeFileSync(CAMINHO_ARQUIVO, jsonString, 'utf-8');
+            await fs.writeFile(CAMINHO_ARQUIVO, jsonString, 'utf-8');
         } catch (erro) {
             console.error("Erro ao salvar no arquivo JSON:", erro);
+            throw new Error("Não foi possível salvar os dados.");
         }
     }
 
-    static buscarDados() {
+    static async buscarDados() {
         try {
-            if (!fs.existsSync(CAMINHO_ARQUIVO)) return [];
-
-            const dadosRaw = fs.readFileSync(CAMINHO_ARQUIVO, 'utf-8');
+            
+            const dadosRaw = await fs.readFile(CAMINHO_ARQUIVO, 'utf-8');
             return JSON.parse(dadosRaw);
         } catch (erro) {
+            if (erro.code === 'ENOENT') {
+                return [];
+            }
             console.error("Erro ao ler o arquivo JSON:", erro);
             return [];
         }
