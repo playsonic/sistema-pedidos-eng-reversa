@@ -1,29 +1,47 @@
-import { Pedidos, ItemPedido } from '../models/entidade';
-import { PedidoSalvar } from '../models/entidade';
+import { Pedidos, Produto } from '../models/entidade.js';
+import { PedidoSalvar } from '../repositories/PedidoRepository.js';
 
 export class PedidoService {
     constructor() {
-        this.Pedidos = new Pedidos();
+        this.pedidoAtual = new Pedidos();
+        this.carregarHistorico();
     }
 
-    adicionarPedido(produto, qtd) {
-        let novoItem = ItemPedido.criarItem(produto, qtd);
-        this.Pedidos.adicionarItem(novoItem);
+    async carregarHistorico() {
+        try {
+            const dadosSalvos = await PedidoSalvar.buscarDados();
 
-        PedidoSalvar.salvarDados(this.Pedidos)
-        
+            if (dadosSalvos && dadosSalvos.itens) {
+                this.pedidoAtual.itens = dadosSalvos.itens;
+                this.pedidoAtual.total = dadosSalvos.total;
+            }
+        } catch (erro) {
+            console.error("Erro ao carregar histórico de pedidos:", erro);
+        }
+    }
+
+    async adicionarPedido(categoria, sabor, qtd) {
+        let novoItem = Produto.criarProduto(categoria, sabor, qtd);
+
+        this.pedidoAtual.adicionarItem(novoItem);
+
+        await PedidoSalvar.salvarDados(this.pedidoAtual);
     }
 
     obterTotalFinal() {
-        
-        return Pedidos.precoFinal(); 
+        return this.pedidoAtual.precoFinal();
     }
 
-    limparPedidos() {
-        this.Pedidos.limpar();
+    async limparPedidos() {
+        this.pedidoAtual.limpar();
+        await PedidoSalvar.salvarDados(this.pedidoAtual);
     }
 
-    removerUltimoItem() {
-        this.Pedidos.removerUltimo();
+    async removerUltimoItem() {
+        this.pedidoAtual.removerUltimo();
+        await PedidoSalvar.salvarDados(this.pedidoAtual);
     }
 }
+
+
+export const services = new PedidoService();
