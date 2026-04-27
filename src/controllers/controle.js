@@ -4,10 +4,10 @@ import { WhatsappService } from '../services/whatsapp.js';
 
 export function adicionarPedido(req, res) {
     
-    const { produto, quantidade } = req.body;
+    const { produto, sabor, quantidade } = req.body;
 
     try {
-        let novoProduto = Produto.criarProduto(produto, "padrão", quantidade);
+        let novoProduto = Produto.criarProduto(produto, sabor, quantidade);
 
         services.adicionarPedido(novoProduto);
 
@@ -48,6 +48,15 @@ export async function finalizarPedido(req, res) {
             } catch (erroWhatsapp) {
                 console.error("Pedido salvo, mas falha ao enviar WhatsApp:", erroWhatsapp);
             }
+        }
+        const numeroDono = ""; 
+
+        const mensagemDono = `*NOVO PEDIDO!*\n\n*Itens a preparar:*\n${textoDetalhes}\n*Valor Total: R$ ${totalFinal.toFixed(2)}*\n*Contato do Cliente:* ${numeroCliente || 'Não informado'}`;
+
+        try {
+            await WhatsappService.enviarMensagem(numeroDono, mensagemDono);
+        } catch (erroDono) {
+            console.error("Falha ao enviar WhatsApp para o dono:", erroDono);
         }
 
         return res.status(200).json({
