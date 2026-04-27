@@ -1,52 +1,92 @@
-import { atualizarTela } from '../views/pedidoView.js';
 import { Produto } from '../models/entidade.js';
-import { services } from '../services/services.js'; 
+import { services } from '../services/services.js';
+import { WhatsappService } from '../services/WhatsappService.js';
 
-export function clickAdcionarPedido() {
-    let pegarElementoProduto = document.getElementById("produto").value;
-    let pegarElementoQuantidade = document.getElementById("qtd").value;
+export function adicionarPedido(req, res) {
+    
+    const { produto, quantidade } = req.body;
 
     try {
-        let novoProduto = Produto.criarProduto(pegarElementoProduto, "padrão", pegarElementoQuantidade);
+        let novoProduto = Produto.criarProduto(produto, "padrão", quantidade);
 
         services.adicionarPedido(novoProduto);
 
-        atualizarTela(services.itens, services.total);
+        return res.status(201).json({
+            mensagem: "Produto adicionado com sucesso!",
+            carrinho: services.pedidoAtual.itens
+        });
 
     } catch (erro) {
-        alert(erro.message);
+        return res.status(400).json({ erro: erro.message });
     }
 }
 
-export function clickFinalizarPedido() {
-    if (services.itens.length === 0) {
-        alert("Adicione itens ao pedido antes de finalizar.");
-        return;
+export async function finalizarPedido(req, res) {
+    const { numeroCliente } = req.body;
+
+    const listaDeItens = services.pedidoAtual.itens;
+
+    if (listaDeItens.length === 0) {
+        return res.status(400).json({ erro: "Adicione itens ao pedido antes de finalizar." });
     }
 
     try {
-        let totalFinal = services.finalizarPedido(); 
-        alert("Total final: R$ " + totalFinal);
+        let totalFinal = services.obterTotalFinal();
 
-        services.limparTudo();
+        let textoDetalhes = "";
+        listaDeItens.forEach(item => {
+            textoDetalhes += `- ${item.qtd}x ${item.produto} (R$ ${item.preco.toFixed(2)})\n`;
+        });
 
-        atualizarTela(services.itens, services.total);
+        await services.limparPedidos();
 
-    } catch (error) {
-        alert(error.message); 
+        if (numeroCliente) {
+            const mensagem = `*Olá! Seu pedido foi finalizado com sucesso.*\n\n*Detalhes do seu pedido:*\n${textoDetalhes}\n*Total a pagar: R$ ${totalFinal.toFixed(2)}*\n\nAgradecemos a preferência!`;
+
+            try {
+                await WhatsappService.enviarMensagem(numeroCliente, mensagem);
+            } catch (erroWhatsapp) {
+                console.error("Pedido salvo, mas falha ao enviar WhatsApp:", erroWhatsapp);
+            }
+        }
+
+        return res.status(200).json({
+            mensagem: "Pedido finalizado com sucesso!",
+            totalPago: totalFinal
+        });
+
+    } catch (erro) {
+        return res.status(500).json({ erro: erro.message });
     }
 }
 
-export function clickRemoverUltimo() {
-    if (services.itens.length === 0) {
-        alert("Adicione itens ao pedido antes de remover.");
-        return;
+export function removerUltimo(req, res) {
+    if (services.pedidoAtual.itens.length === 0) {
+        return res.status(400).json({ erro: "Adicione itens ao pedido antes de remover." });
     }
 
     try {
-        services.removerUltimo();
-        atualizarTela(services.itens, services.total);
-    } catch (error) {
-        alert(error.message);
+        services.removerUltimoItem();
+
+        return res.status(200).json({
+            mensagem: "Último item removido.",
+            carrinhoAtualizado: services.pedidoAtual.itens
+        });
+    } catch (erro) {
+        return res.status(500).json({ erro: erro.message });
+    }
+}
+
+export function buscarPedidoAtual(req, res) {
+    try {
+        const itens = services.pedidoAtual.itens;
+        const total = services.obterTotalFinal();
+
+        return res.status(200).json({
+            itens: itens,
+            total: total
+        });
+    } catch (erro) {
+        return res.status(500).json({ erro: erro.message });
     }
 }
