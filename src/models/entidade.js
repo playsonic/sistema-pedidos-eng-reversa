@@ -82,17 +82,13 @@ export class Pedidos {
         }
     }
 
-    precoFinal() {
+    precoFinal(estrategiaDeDesconto) {
         let taxa = this.total * 0.05;
-        let desconto = this.total;
 
-        if (this.total > 100) {
-            desconto -= (this.total * 0.2);
-        } else if (this.total > 50) {
-            desconto -= (this.total * 0.1);
-        }
+       
+        let valorDoDesconto = estrategiaDeDesconto ? estrategiaDeDesconto(this.total) : 0;
 
-        return desconto + taxa;
+        return (this.total - valorDoDesconto) + taxa;
     }
 
     limpar() {

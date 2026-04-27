@@ -29,7 +29,22 @@ export class PedidoService {
     }
 
     obterTotalFinal() {
-        return this.pedidoAtual.precoFinal();
+        const totalAtual = this.pedidoAtual.total;
+
+        const funcaoDesconto = this.#escolherDesconto(totalAtual);
+
+        return this.pedidoAtual.precoFinal(funcaoDesconto);
+    }
+
+    #escolherDesconto(total) {
+        if (total > 100) {
+            return (valor) => valor * 0.20; 
+        }
+        if (total > 50) {
+            return (valor) => valor * 0.10; 
+        }
+
+        return (valor) => 0; 
     }
 
     async limparPedidos() {
