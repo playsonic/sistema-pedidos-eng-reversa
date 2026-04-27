@@ -1,6 +1,6 @@
 import { Produto } from '../models/entidade.js';
 import { services } from '../services/services.js';
-import { WhatsappService } from '../services/WhatsappService.js';
+import { WhatsappService } from '../services/whatsapp.js';
 
 export function adicionarPedido(req, res) {
     

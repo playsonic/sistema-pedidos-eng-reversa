@@ -129,6 +129,20 @@ async function clickRemoverUltimo() {
     }
 }
 
-window.onload = () => {
-    atualizarTela();
+if (typeof window !== 'undefined') {
+    window.onload = () => {
+        atualizarTela();
+    };
+}
+
+
+window.clickAdicionarPedido = clickAdicionarPedido;
+window.clickFinalizarPedido = clickFinalizarPedido;
+window.clickRemoverUltimo = clickRemoverUltimo;
+window.mostrarOpcoesCorretas = mostrarOpcoesCorretas;
+
+
+export {
+    atualizarTela, mostrarOpcoesCorretas, obterSaborSelecionado,
+    clickAdicionarPedido, clickFinalizarPedido, clickRemoverUltimo
 };
