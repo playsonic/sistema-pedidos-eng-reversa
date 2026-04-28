@@ -11,12 +11,6 @@
 
 ---
 
-Aqui está o seu texto revisado e formatado. Corrigi alguns pequenos erros de digitação, melhorei a fluidez de algumas frases para deixar o texto mais profissional, mas mantive toda a sua essência, o seu tom de voz e as suas explicações originais (que ficaram excelentes do ponto de vista técnico).
-
-Está pronto para ser copiado e colado direto no seu `README.md` do GitHub:
-
----
-
 ## Sobre o Projeto
 
 Este projeto consiste em uma atividade avaliativa da disciplina de Arquitetura de Sistemas. O objetivo principal foi analisar e refatorar um código base disponibilizado pelo docente, transformando um sistema simples em uma aplicação bem estruturada e mais próxima do nível exigido pelo mercado.
