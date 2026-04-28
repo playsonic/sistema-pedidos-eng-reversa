@@ -48,7 +48,6 @@ describe('Testes do PedidoController', () => {
 
             adicionarPedido(req, res);
 
-            // ATUALIZAÇÃO 2: Espera que a fábrica crie com o sabor enviado, em vez de "padrão"
             expect(Produto.criarProduto).toHaveBeenCalledWith('pizzap', 'calabresa', 2);
             expect(services.adicionarPedido).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(201);
