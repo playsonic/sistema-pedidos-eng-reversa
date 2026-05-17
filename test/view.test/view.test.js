@@ -1,16 +1,13 @@
 /**
  * @jest-environment jsdom
  */
-/**
- * @jest-environment jsdom
- */
-import { jest } from '@jest/globals'; 
+import { jest } from '@jest/globals';
 import {
     atualizarTela,
     mostrarOpcoesCorretas,
     obterSaborSelecionado,
     clickAdicionarPedido
-} from '../src/views/view.js';
+} from '../../src/views/view.js';
 
 global.fetch = jest.fn();
 global.alert = jest.fn();
@@ -48,7 +45,6 @@ describe('Testes do Front-end (view.js)', () => {
 
     describe('mostrarOpcoesCorretas()', () => {
         test('Deve mostrar apenas as opções de Suco quando Suco for selecionado', () => {
-            // Simulamos o usuário selecionando "suco"
             document.getElementById('categoria').value = 'suco';
 
             mostrarOpcoesCorretas();
@@ -92,32 +88,45 @@ describe('Testes do Front-end (view.js)', () => {
     describe('clickAdicionarPedido()', () => {
         test('Deve disparar um alert se tentar adicionar sem quantidade', async () => {
             document.getElementById('categoria').value = 'pizzap';
-            document.getElementById('qtd').value = ''; 
+            document.getElementById('qtd').value = '';
 
             await clickAdicionarPedido();
 
             expect(global.alert).toHaveBeenCalledWith("Preencha a categoria e a quantidade!");
-            expect(global.fetch).not.toHaveBeenCalled(); 
+            expect(global.fetch).not.toHaveBeenCalled();
         });
 
-        test('Deve enviar os dados para a API (POST) e limpar o campo quantidade', async () => {
+        test('Deve enviar POST para API e Observer deve engatilhar um GET para atualizar a tela', async () => {
             document.getElementById('categoria').value = 'suco';
             document.getElementById('saboresSuco').value = 'uva';
             document.getElementById('qtd').value = '2';
 
-            global.fetch.mockResolvedValue({
-                ok: true,
-                json: async () => ({ mensagem: "Produto adicionado com sucesso!" })
-            });
+            
+            global.fetch
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => ({ mensagem: "Produto adicionado com sucesso!" })
+                })
+                .mockResolvedValueOnce({
+                    ok: true,
+                    json: async () => ({
+                        itens: [{ produto: 'suco uva', qtd: 2, preco: 4.00 }],
+                        total: 4.00
+                    })
+                });
 
             await clickAdicionarPedido();
 
-            expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/pedidos', expect.objectContaining({
+            expect(global.fetch).toHaveBeenNthCalledWith(1, 'http://localhost:3000/pedidos', expect.objectContaining({
                 method: 'POST',
                 body: JSON.stringify({ produto: 'suco', sabor: 'uva', quantidade: '2' })
             }));
 
+            expect(global.fetch).toHaveBeenNthCalledWith(2, 'http://localhost:3000/pedidos');
+
             expect(document.getElementById('qtd').value).toBe('');
+
+            expect(document.getElementById('total').innerText).toBe('4.00');
         });
     });
 });
