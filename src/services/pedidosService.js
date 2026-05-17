@@ -1,5 +1,7 @@
-import { Pedidos, Produto } from '../models/entidade.js';
+import { Produto } from '../models/produto.js';
+import { Pedidos } from '../models/pedido.js';
 import { PedidoSalvar } from '../repositories/PedidoRepository.js';
+import { CalculadoraDeDesconto } from '../descontoService.js'; 
 
 export class PedidoService {
     constructor() {
@@ -31,21 +33,12 @@ export class PedidoService {
     obterTotalFinal() {
         const totalAtual = this.pedidoAtual.total;
 
-        const funcaoDesconto = this.#escolherDesconto(totalAtual);
+        const estrategiaDesconto = CalculadoraDeDesconto.obterEstrategia(totalAtual);
 
-        return this.pedidoAtual.precoFinal(funcaoDesconto);
+
+        return this.pedidoAtual.precoFinal((valor) => estrategiaDesconto.calcular(valor));
     }
 
-    #escolherDesconto(total) {
-        if (total > 100) {
-            return (valor) => valor * 0.20; 
-        }
-        if (total > 50) {
-            return (valor) => valor * 0.10; 
-        }
-
-        return (valor) => 0; 
-    }
 
     async limparPedidos() {
         this.pedidoAtual.limpar();
