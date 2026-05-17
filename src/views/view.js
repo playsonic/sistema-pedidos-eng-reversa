@@ -1,5 +1,21 @@
 const API_URL = 'http://localhost:3000';
 
+class CarrinhoSubject {
+    constructor() {
+        this.observadores = [];
+    }
+
+    inscrever(funcaoObservadora) {
+        this.observadores.push(funcaoObservadora);
+    }
+
+    notificar() {
+        this.observadores.forEach(observador => observador());
+    }
+}
+
+const carrinhoSubject = new CarrinhoSubject();
+
 async function atualizarTela() {
     try {
         const resposta = await fetch(`${API_URL}/pedidos`);
@@ -26,6 +42,8 @@ async function atualizarTela() {
         console.error("Erro na comunicação com a API:", erro);
     }
 }
+
+carrinhoSubject.inscrever(atualizarTela);
 
 function mostrarOpcoesCorretas() {
     document.getElementById('divPizza').classList.add('escondido');
@@ -54,7 +72,6 @@ function obterSaborSelecionado(categoria) {
     return "";
 }
 
-
 async function clickAdicionarPedido() {
     const categoria = document.getElementById("categoria").value;
     const quantidade = document.getElementById("qtd").value;
@@ -71,7 +88,7 @@ async function clickAdicionarPedido() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                produto: categoria, 
+                produto: categoria,
                 sabor: sabor,
                 quantidade: quantidade
             })
@@ -80,8 +97,8 @@ async function clickAdicionarPedido() {
         const retorno = await resposta.json();
 
         if (resposta.ok) {
-            atualizarTela(); 
-            document.getElementById("qtd").value = ""; 
+            carrinhoSubject.notificar();
+            document.getElementById("qtd").value = "";
         } else {
             alert("Erro: " + retorno.erro);
         }
@@ -103,8 +120,21 @@ async function clickFinalizarPedido() {
         const retorno = await resposta.json();
 
         if (resposta.ok) {
-            alert(retorno.mensagem + "\nTotal pago: R$ " + retorno.totalPago);
-            atualizarTela();
+            alert(retorno.mensagem + "\nTotal pago: R$ " + retorno.totalPago.toFixed(2));
+
+            if (retorno.linksWhatsapp) {
+                if (retorno.linksWhatsapp.enviarParaEstabelecimento) {
+                    window.open(retorno.linksWhatsapp.enviarParaEstabelecimento, '_blank');
+                }
+
+                if (retorno.linksWhatsapp.enviarParaCliente) {
+                    setTimeout(() => {
+                        window.open(retorno.linksWhatsapp.enviarParaCliente, '_blank');
+                    }, 500);
+                }
+            }
+
+            carrinhoSubject.notificar();
         } else {
             alert("Erro: " + retorno.erro);
         }
@@ -120,7 +150,7 @@ async function clickRemoverUltimo() {
         const retorno = await resposta.json();
 
         if (resposta.ok) {
-            atualizarTela();
+            carrinhoSubject.notificar();
         } else {
             alert("Erro: " + retorno.erro);
         }
@@ -135,12 +165,10 @@ if (typeof window !== 'undefined') {
     };
 }
 
-
 window.clickAdicionarPedido = clickAdicionarPedido;
 window.clickFinalizarPedido = clickFinalizarPedido;
 window.clickRemoverUltimo = clickRemoverUltimo;
 window.mostrarOpcoesCorretas = mostrarOpcoesCorretas;
-
 
 export {
     atualizarTela, mostrarOpcoesCorretas, obterSaborSelecionado,
