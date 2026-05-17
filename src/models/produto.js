@@ -1,3 +1,5 @@
+import { ItemPedido } from './itemPedido.js';
+
 export class Produto {
     static #cardapio = {
         "pizzap": 
