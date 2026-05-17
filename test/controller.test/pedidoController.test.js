@@ -1,14 +1,14 @@
 import { jest } from '@jest/globals';
 
-jest.unstable_mockModule('../src/models/entidade.js', () => ({
+jest.unstable_mockModule('../src/models/produto.js', () => ({
     Produto: { criarProduto: jest.fn() }
 }));
 
 jest.unstable_mockModule('../src/services/whatsapp.js', () => ({
-    WhatsappService: { enviarMensagem: jest.fn() }
+    WhatsappService: { gerarLinkWaMe: jest.fn() }
 }));
 
-jest.unstable_mockModule('../src/services/services.js', () => ({
+jest.unstable_mockModule('../src/services/pedidosService.js', () => ({
     services: {
         pedidoAtual: { itens: [] },
         adicionarPedido: jest.fn(),
@@ -18,9 +18,9 @@ jest.unstable_mockModule('../src/services/services.js', () => ({
     }
 }));
 
-const { adicionarPedido, finalizarPedido, removerUltimo, buscarPedidoAtual } = await import('../src/controllers/controle.js');
-const { Produto } = await import('../src/models/entidade.js');
-const { services } = await import('../src/services/services.js');
+const { adicionarPedido, finalizarPedido, removerUltimo, buscarPedidoAtual } = await import('../../src/controllers/pedidoController.js');
+const { Produto } = await import('../src/models/produto.js');
+const { services } = await import('../src/services/pedidosService.js');
 const { WhatsappService } = await import('../src/services/whatsapp.js');
 
 const mockRequest = (body = {}) => ({ body });
@@ -40,15 +40,14 @@ describe('Testes do PedidoController', () => {
     });
 
     describe('adicionarPedido()', () => {
-        test('Deve adicionar um produto com sabor e retornar status 201', () => {
+        test('Deve adicionar um produto com sabor e retornar status 201', async () => {
             const req = mockRequest({ produto: 'pizzap', sabor: 'calabresa', quantidade: 2 });
             const res = mockResponse();
 
             Produto.criarProduto.mockReturnValue({ produto: 'pizzap calabresa', qtd: 2, preco: 10 });
 
-            adicionarPedido(req, res);
+            await adicionarPedido(req, res);
 
-            // ATUALIZAÇÃO 2: Espera que a fábrica crie com o sabor enviado, em vez de "padrão"
             expect(Produto.criarProduto).toHaveBeenCalledWith('pizzap', 'calabresa', 2);
             expect(services.adicionarPedido).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(201);
@@ -57,7 +56,7 @@ describe('Testes do PedidoController', () => {
             }));
         });
 
-        test('Deve retornar erro 400 se o Produto rejeitar a criação', () => {
+        test('Deve retornar erro 400 se o Produto rejeitar a criação', async () => {
             const req = mockRequest({ produto: 'produto_invalido', sabor: 'inexistente', quantidade: 0 });
             const res = mockResponse();
 
@@ -65,7 +64,7 @@ describe('Testes do PedidoController', () => {
                 throw new Error("Quantidade inválida.");
             });
 
-            adicionarPedido(req, res);
+            await adicionarPedido(req, res);
 
             expect(res.status).toHaveBeenCalledWith(400);
             expect(res.json).toHaveBeenCalledWith({ erro: "Quantidade inválida." });
@@ -81,47 +80,55 @@ describe('Testes do PedidoController', () => {
 
             expect(res.status).toHaveBeenCalledWith(400);
             expect(res.json).toHaveBeenCalledWith({ erro: "Adicione itens ao pedido antes de finalizar." });
-            expect(WhatsappService.enviarMensagem).not.toHaveBeenCalled();
+
+            expect(WhatsappService.gerarLinkWaMe).not.toHaveBeenCalled();
         });
 
-        test('Deve finalizar pedido, limpar carrinho e chamar Whatsapp para cliente e dono', async () => {
+        test('Deve finalizar pedido, limpar carrinho e retornar links do WhatsApp para cliente e dono', async () => {
             const req = mockRequest({ numeroCliente: '5511999999999' });
             const res = mockResponse();
 
             services.pedidoAtual.itens = [{ produto: 'pizzap', qtd: 1, preco: 10 }];
             services.obterTotalFinal.mockReturnValue(10);
 
+            WhatsappService.gerarLinkWaMe.mockReturnValue('https://wa.me/mocklink');
+
             await finalizarPedido(req, res);
 
             expect(services.limparPedidos).toHaveBeenCalled();
 
-            expect(WhatsappService.enviarMensagem).toHaveBeenCalledTimes(2);
+            expect(WhatsappService.gerarLinkWaMe).toHaveBeenCalledTimes(2);
 
             expect(res.status).toHaveBeenCalledWith(200);
+
             expect(res.json).toHaveBeenCalledWith({
                 mensagem: "Pedido finalizado com sucesso!",
-                totalPago: 10
+                totalPago: 10,
+                linksWhatsapp: {
+                    enviarParaCliente: 'https://wa.me/mocklink',
+                    enviarParaEstabelecimento: 'https://wa.me/mocklink'
+                }
             });
         });
     });
 
     describe('removerUltimo()', () => {
-        test('Deve retornar erro 400 ao tentar remover de um carrinho vazio', () => {
+        test('Deve retornar erro 400 ao tentar remover de um carrinho vazio', async () => {
             const req = mockRequest();
             const res = mockResponse();
 
-            removerUltimo(req, res);
+            await removerUltimo(req, res);
 
             expect(res.status).toHaveBeenCalledWith(400);
         });
 
-        test('Deve remover o último item e retornar status 200', () => {
+        test('Deve remover o último item e retornar status 200', async () => {
             const req = mockRequest();
             const res = mockResponse();
 
             services.pedidoAtual.itens = [{ produto: 'suco laranja', qtd: 1 }];
 
-            removerUltimo(req, res);
+            await removerUltimo(req, res);
 
             expect(services.removerUltimoItem).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(200);
