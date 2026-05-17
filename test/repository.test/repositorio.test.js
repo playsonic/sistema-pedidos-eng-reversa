@@ -8,7 +8,7 @@ jest.unstable_mockModule('fs/promises', () => ({
 }));
 
 const fs = (await import('fs/promises')).default;
-const { PedidoSalvar } = await import('../src/repositories/repositorio.js');
+const { PedidoSalvar } = await import('../../src/repositories/repositorio.js');
 
 
 describe('Testes do PedidoSalvar (Repository)', () => {
