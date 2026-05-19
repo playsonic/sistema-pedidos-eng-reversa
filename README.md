@@ -1,4 +1,4 @@
-# Atividade 4 - Arquitetura de Sistemas - Engenharia Reversa
+# Atividade 05 - Refatoração da Atividade 04 para o Padrão MVC
 
 ## Informações da Atividade
 
@@ -9,62 +9,81 @@
 **Curso:** Análise e Desenvolvimento de Sistemas  
 **Instituição:** IFCE - Campus Boa Viagem  
 
----
-
-Aqui está o seu texto revisado e formatado. Corrigi alguns pequenos erros de digitação, melhorei a fluidez de algumas frases para deixar o texto mais profissional, mas mantive toda a sua essência, o seu tom de voz e as suas explicações originais (que ficaram excelentes do ponto de vista técnico).
-
-Está pronto para ser copiado e colado direto no seu `README.md` do GitHub:
-
----
-
 ## Sobre o Projeto
 
-Este projeto consiste em uma atividade avaliativa da disciplina de Arquitetura de Sistemas. O objetivo principal foi analisar e refatorar um código base disponibilizado pelo docente, transformando um sistema simples em uma aplicação bem estruturada e mais próxima do nível exigido pelo mercado.
-
-Abaixo, detalho quais foram as melhorias estruturais implementadas e os padrões de projeto aplicados nessa refatoração.
+Este projeto consiste em uma atividade avaliativa da disciplina de Arquitetura de Sistemas. O objetivo principal foi analisar e refatorar um código base disponibilizado pelo docente, transformando um sistema simples em uma aplicação bem estruturada usando a arquitetura MVC.
 
 ---
 
 ## Respostas
 
-### 1. Quais problemas foram resolvidos?
+### 7. Análise Arquitetural
 
-O código original apresentava problemas lógicos e estruturais. Com as refatorações realizadas, foram adicionadas camadas de regras de negócio mais refinadas junto a uma estrutura muito mais maleável. Isso permite que mudanças — como o controle de descontos, ajuste de preços e atualizações de catálogo, sejam feitas de maneira muito mais rápida e segura.
+7.1 - **O MVC melhorou a organização?**
+Sim, melhorou significativamente. A adoção dessa arquitetura permite uma separação mais clara das informações e responsabilidades do código. Isso proporciona um fluxo de evolução e correção mais natural e coeso, facilitando o trabalho não apenas para o desenvolvedor que iniciou o projeto, mas também para outros profissionais que venham a assumir o código no futuro.
 
-Além disso, a implementação da API permitiu automatizar a comunicação entre a interface do cliente e o sistema da loja. Por fim, a nova base arquitetural permite que o código evolua de forma muito mais natural ao longo do tempo.
+7.2 - **sistema ficou mais desacoplado?**
+Sim, agora as funções estão devidamente isoladas. Além de respeitarem o princípio da responsabilidade única, os arquivos estão divididos em camadas específicas como cálculos de descontos, serviços de pedido, etc. Essa separação reduz o acoplamento e confere maior fluidez e modularidade ao sistema.
 
-### 2. Como a arquitetura melhorou o sistema?
+7.3 - **Onde ainda existem problemas?**
+Apesar das melhorias, é notável que a navegação entre os diretórios pode se tornar confusa, semelhante a uma grande biblioteca com poucas subdivisões, dificultando a busca por componentes específicos. Além disso, à medida que o sistema cresce, os Models, Views e Controllers tendem a ficar muito extensos. Essa sobrecarga de responsabilidades gera um alto acoplamento, o exato oposto do objetivo da refatoração, dificultando o acompanhamento e a evolução do software.
 
-A arquitetura baseada em camadas tornou o sistema flexível e prático. Agora, é possível realizar modificações pontuais, como alterar o cardápio ou aplicar novas regras de desconto, sem o risco de prejudicar outras partes do código.
+7.4 - **O MVC seria suficiente para um sistema muito grande?**
+Não de forma isolada. Seria necessária a integração com outros padrões arquiteturais para mitigar os problemas estruturais do modelo puro. Em projetos de grande escala, as falhas inerentes ao MVC tradicional tendem a se amplificar com o desenvolvimento, comprometendo a estabilidade e a escalabilidade do sistema.
 
-Essa separação de responsabilidades garante uma evolução mais concisa, permitindo atualizações e melhorias contínuas sem a necessidade de uma reescrita rigorosa e completa do sistema a cada novo ciclo de desenvolvimento.
+7.5 - **Quais limitações você percebeu?**
+A principal limitação é a degradação estrutural conforme o projeto escala. Os componentes centrais (Models, Views e Controllers) acabam absorvendo muitas responsabilidades, resultando em classes infladas, alto acoplamento e, consequentemente, uma navegação mais complexa entre os arquivos e dependências.
 
-### 3. Onde os padrões de projeto foram aplicados?
+7.6 - **Onde os Services ajudaram?**
+Eles foram fundamentais para centralizar e controlar as regras de negócio e a lógica do sistema. Atuando como uma camada intermediária de orientação, os serviços mantêm o baixo acoplamento e isolam responsabilidades, evitando que os Controllers e os Models fiquem poluídos com lógicas operacionais complexas.
 
-#### Padrão Factory
+7.7 - **Onde os Repositories ajudaram?**
+De forma semelhante aos Services, os Repositories isolam uma responsabilidade crucial do sistema: a persistência e a manipulação de dados. Eles abstraem a lógica de acesso ao banco (ou arquivos), facilitando o seu uso no restante do código. Isso evita que Controllers ou Models fiquem diretamente acoplados à infraestrutura de dados, centralizando essas interações em um único local.
 
-Aplicado na classe `Produto`, no arquivo `entidade.js`, especificamente no método `static criarProduto()`.
-O `PedidoService` apenas faz a solicitação para a "classe fábrica". A fábrica, por sua vez, faz a verificação adequada de cada pedido (por exemplo, verifica se o sabor existe e busca o preço correto). No fim, ela devolve tudo encapsulado como um objeto `ItemPedido`, já montado e pronto para uso.
+### 3. Problemas do MVC Tradicional
 
-#### Padrão Singleton
+Embora seja muito conciso e extremamente útil, o modelo ainda apresenta falhas, pois a organização dos diretórios pode gerar confusão à medida que o código cresce. Somado a isso, a expansão do sistema faz com que os Models, Views e Controllers fiquem excessivamente extensos. Esse acúmulo de funções resulta em um forte acoplamento, o que prejudica diretamente a manutenção e a escalabilidade do projeto.
 
-Aplicado no arquivo `services.js` através da exportação: `export const services = new PedidoService()`.
-Como estamos utilizando o ecossistema do Node.js, aproveitamos o seu comportamento nativo de cache de módulos. Ao instanciar e exportar essa constante, criamos o Singleton. Dessa forma, quando diferentes arquivos do projeto, como `controle.js` e `whatsapp.js`, importam essa variável, o Node.js não cria serviços diferentes; ele entrega a mesma exata instância salva na memória para todos eles, garantindo a centralização do estado da aplicação.
+### 4. Comparação Arquitetural
 
-#### Padrão Strategy
+#### **Organização**:
 
-Aplicado na integração entre a classe `PedidoService`, no `services.js`, e a classe `Pedidos`, no `entidade.js`.
-No `PedidoService`, existe o método privado `#escolherDesconto(total)`. Ele atua como um selecionador de estratégias adequadas: baseado no valor da compra, ele retorna uma função matemática diferente para o desconto. Em seguida, essa função é passada como parâmetro para `this.pedidoAtual.precoFinal(funcaoDesconto)`.
-A classe `Pedidos` não tem ideia de como o desconto é calculado. Ela age de forma obediente: apenas pega o total do carrinho, joga dentro da função que recebeu e soma a taxa. Isso respeita o princípio de manter as classes fechadas para modificação, mas abertas para extensão.
+**Sistema Original**: A falta de organização se manifesta tanto na interface quanto na modelagem de dados: tamanhos de pizza tratados como itens avulsos, combos que não consolidam os preços (mostrando os valores unitários), uma área de desconto que permanece ativa sem existir promoção, e ações duplicadas no carrinho. Essas inconsistências evidenciam um mau planejamento do domínio da aplicação e desorganização do código-fonte.
 
-#### Padrão Repository
+**MVC Refatorado**: A organização do sistema agora é notória. A arquitetura foi dividida em diretórios baseados em suas respectivas responsabilidades. Dessa forma, os arquivos de cada diretório focam exclusivamente nas tarefas a eles designadas, tornando a leitura, a manutenção e a expansão do projeto consideravelmente mais fáceis.
 
-Aplicado na classe `PedidoSalvar`, no arquivo `PedidoRepository.js`.
-Nessa estrutura, o `PedidoService` atua de forma "cega". Ele não faz ideia de como a persistência dos dados ocorre, não conhece a biblioteca `fs`, o `path.resolve`, nem manipula arquivos `.json`. Toda a infraestrutura do Node.js (lidar com leitura de disco, tratar erros de arquivo não encontrado e converter JSON) ficou encarregada pelo Repository. Se ocorrer uma mudança de `.json` para um banco de dados real no futuro, não será necessário mudar o Service ou as Entidades; só é preciso alterar a classe Repository.
+#### **Coesão**:
 
-### 4. Quais benefícios foram obtidos?
+**Sistema Original**: Observa-se uma baixa coesão estrutural. As funções parecem acumular múltiplas responsabilidades, ferindo princípios básicos de design. Um reflexo prático disso é a complexidade desnecessária gerada no fluxo de bloqueio de pedidos fora do horário de atendimento. Essa mistura de lógicas (validação de horário acoplada à interface do carrinho, por exemplo) compromete a estabilidade e mostra que o sistema tem funções pouco coesas.
 
-* **Flexibilidade de manutenção:** Atualizações pontuais tornaram-se mais seguras.
-* **Facilidade de desenvolvimento:** Inclusão de novas funcionalidades e melhorias de forma escalável.
-* **Organização e legibilidade:** O código tornou-se muito mais limpo, permitindo um entendimento tranquilo de onde cada responsabilidade reside.
-* **Separação clara entre Domínio e Serviço:** Melhoria expressiva na lógica dos services e do domínio, permitindo uma fluidez perfeita de dados entre ambas as partes.
+**MVC Refatorado**: O sistema apresenta alta coesão, com funções separadas em pastas e arquivos específicos. A introdução das camadas de Services e Repositories permitiu extrair lógicas que, se mantidas nos Models ou Controllers, gerariam baixo isolamento estrutural. Com as responsabilidades bem delimitadas, Controllers e Models focam apenas em seus papéis essenciais, sem acúmulo de regras de negócio complexas.
+
+#### **Acoplamento**:
+
+**Sistema Original**: O sistema exibe um alto nível de acoplamento, com forte interdependência entre seus componentes. Isso se traduz em anomalias de navegação, como o roteamento confuso nas categorias de combos ou a existência de dois botões de "finalizar pedido" na mesma tela. Esse emaranhado torna o código complexo e frágil para os desenvolvedores, além de gerar uma interface que frustra o usuário.
+
+**MVC Refatorado**: A arquitetura possui um baixo nível de acoplamento. As camadas de Controller, View e Model detêm suas próprias responsabilidades, sem vazamento de escopo entre elas. A adoção dos diretórios de Services e Repositories foi crucial para esse resultado, retirando regras de negócio e de persistência do Model e do Controller, que agora atuam de forma enxuta, apenas orquestrando as chamadas aos serviços adequados.
+
+#### **Reutilização**:
+
+**Sistema Original**: O código original apresenta baixa capacidade de reutilização, pois foi desenvolvido de forma rígida e limitando-se a atender exclusivamente à demanda imediata. Essa especificidade o torna inflexível, prendendo a estrutura da aplicação ao seu próprio conceito restrito de projeto.
+
+**MVC Refatorado**: A arquitetura atualizada favorece uma alta reutilização. O software tornou-se maleável e modular, podendo ser reaproveitado para além do escopo original do projeto. Por exemplo, a lógica estrutural de pedidos poderia ser facilmente adaptada de um restaurante para um e-commerce de móveis com um mínimo de atrito.
+
+#### **Clareza estrutural**:
+
+**Sistema Original**: O software original é intuitivo devido à sua extrema simplicidade, consistindo em apenas três arquivos de fácil dedução. Essa estrutura básica permite que tanto desenvolvedores novatos quanto experientes identifiquem rapidamente o propósito de cada documento sem grandes problemas.
+
+**MVC Refatorado**: O sistema reestruturado adota um paradigma completamente novo, distribuído em diretórios com papéis específicos. Embora demande um conhecimento prévio de padrões de projeto de software para ser plenamente compreendido, essa maior complexidade inicial é amplamente compensada pelos benefícios robustos de organização, previsibilidade e controle de fluxo.
+
+#### **Escalabilidade**:
+
+**Sistema Original**: O código legado oferece pouca margem para escalabilidade. Devido ao alto acoplamento e à sua simplicidade engessada, é extremamente difícil adicionar funcionalidades sem impactar ou reescrever grande parte do código existente, o que evidencia um planejamento arquitetural limitado.
+
+**MVC Refatorado**: A nova arquitetura garante alta coesão, permitindo que o sistema cresça de forma orgânica. É possível atualizar ou expandir módulos específicos sem gerar efeitos colaterais no restante da aplicação, tornando o processo de escalonamento muito mais seguro. Contudo, cabe ressaltar que, à medida que a aplicação ganha grande escala, o padrão MVC puro pode enfrentar desafios de administração devido à tendência de surgimento de Controllers sobrecarregados (Fat Controllers).
+
+#### **Facilidade de manutenção**:
+
+**Sistema Original**: Devido ao alto acoplamento e à baixa coesão, a manutenção do código original é trabalhosa e arriscada. Uma falha isolada tende a propagar erros pelo restante da aplicação, e o esforço para corrigir um bug frequentemente exige alterações colaterais em blocos de código que já estavam operando corretamente.
+
+**MVC Refatorado**: A combinação de baixo acoplamento e alta coesão transforma a manutenção em uma tarefa ágil e controlada. Como cada função está isolada e atende a uma única responsabilidade, a raiz dos problemas é facilmente identificável. Alterações podem ser aplicadas apenas na fração necessária do código, sem comprometer a integridade sistêmica.
