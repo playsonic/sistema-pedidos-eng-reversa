@@ -1,4 +1,4 @@
-import { ItemPedido } from './itemPedido.js';
+import { ItemPedido } from '../../orders/entities/itemPedido.js';
 
 export class Produto {
     static #cardapio = {
