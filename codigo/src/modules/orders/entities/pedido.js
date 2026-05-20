@@ -1,4 +1,4 @@
-import { ItemPedido } from './itemPedido.js';
+import { ItemPedido } from '../../../models/itemPedido.js';
 
 export class Pedidos {
     constructor() {

@@ -1,7 +1,7 @@
-import { Produto } from '../models/produto.js';
-import { Pedidos } from '../models/pedido.js';
-import { PedidoSalvar } from '../repositories/PedidoRepository.js';
-import { CalculadoraDeDesconto } from '../descontoService.js'; 
+import { Produto } from '../../products/entities/produto.js';
+import { Pedidos } from '../../orders/entities/pedido.js';
+import { PedidoSalvar } from '../repositories/pedidoRepository.js';
+import { CalculadoraDeDesconto } from '../../payments/services/CalculadoraDeDesconto.js'; 
 
 export class PedidoService {
     constructor() {
