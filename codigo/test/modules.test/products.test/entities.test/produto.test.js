@@ -1,4 +1,4 @@
-import { Produto } from '../src/models/produto.js';
+import { Produto } from '../../../../src/modules/products/entities/produto.js';
 
 describe('Testes da classe Produto (Padrão Factory)', () => {
 

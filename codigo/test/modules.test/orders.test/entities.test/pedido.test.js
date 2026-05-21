@@ -1,5 +1,5 @@
-import { Pedidos } from '../src/models/pedido.js';
-import { Produto } from '../src/models/produto.js';
+import { Pedidos } from '../../../../ src/modules/orders/entities/pedido.js';
+import { Produto } from '../../../../src/modules/products/entities/produto.js';
 
 describe('Testes da classe Pedidos', () => {
 
@@ -20,9 +20,9 @@ describe('Testes da classe Pedidos', () => {
         const pedido = new Pedidos();
 
         // Simulando as funções de callback que a Strategy passaria
-        const semDesconto = (total) => 0;
-        const desconto10 = (total) => total * 0.10;
-        const desconto20 = (total) => total * 0.20;
+        const semDesconto = { calcular: (total) => 0 };
+        const desconto10 = { calcular: (total) => total * 0.10 };
+        const desconto20 = { calcular: (total) => total * 0.20 };
 
         // Teste 1: Sem desconto (Apenas Taxa de 5%)
         pedido.adicionarItem(Produto.criarProduto('pizzap', 'calabresa', 2)); // Total 20
