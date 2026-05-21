@@ -1,5 +1,4 @@
-
-import { WhatsappService } from '../../src/services/whatsapp.js';
+import { WhatsappService } from '../../../src/shared/utils/linkWhatsapp.js';
 import { jest } from '@jest/globals';
 
 describe('Testes do WhatsappService', () => {

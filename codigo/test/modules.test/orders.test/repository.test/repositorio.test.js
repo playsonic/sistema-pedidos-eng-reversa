@@ -7,11 +7,18 @@ jest.unstable_mockModule('fs/promises', () => ({
     }
 }));
 
+jest.unstable_mockModule('../../../../src/shared/utils/logger.js', () => ({
+    logger: {
+        info: jest.fn(),
+        erro: jest.fn()
+    }
+}));
+
 const fs = (await import('fs/promises')).default;
-const { PedidoSalvar } = await import('../../src/repositories/repositorio.js');
 
+const { PedidoRepository } = await import('../../../../src/modules/orders/repositories/pedidoRepository.js');
 
-describe('Testes do PedidoSalvar (Repository)', () => {
+describe('Testes do PedidoRepository', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -23,7 +30,7 @@ describe('Testes do PedidoSalvar (Repository)', () => {
 
             fs.writeFile.mockResolvedValue();
 
-            await PedidoSalvar.salvarDados(dadosMock);
+            await PedidoRepository.salvarDados(dadosMock);
 
             expect(fs.writeFile).toHaveBeenCalledTimes(1);
 
@@ -37,7 +44,7 @@ describe('Testes do PedidoSalvar (Repository)', () => {
         test('Deve lançar erro genérico se o writeFile falhar', async () => {
             fs.writeFile.mockRejectedValue(new Error("Disco cheio"));
 
-            await expect(PedidoSalvar.salvarDados({}))
+            await expect(PedidoRepository.salvarDados({}))
                 .rejects
                 .toThrow("Não foi possível salvar os dados.");
         });
@@ -50,7 +57,7 @@ describe('Testes do PedidoSalvar (Repository)', () => {
 
             fs.readFile.mockResolvedValue(jsonString);
 
-            const resultado = await PedidoSalvar.buscarDados();
+            const resultado = await PedidoRepository.buscarDados();
 
             expect(fs.readFile).toHaveBeenCalledTimes(1);
             expect(resultado).toEqual(dadosEsperados);
@@ -62,7 +69,7 @@ describe('Testes do PedidoSalvar (Repository)', () => {
 
             fs.readFile.mockRejectedValue(erroEnoent);
 
-            const resultado = await PedidoSalvar.buscarDados();
+            const resultado = await PedidoRepository.buscarDados();
 
             expect(resultado).toEqual([]);
         });
@@ -70,7 +77,7 @@ describe('Testes do PedidoSalvar (Repository)', () => {
         test('Deve retornar um array vazio [] para qualquer outro tipo de erro de leitura', async () => {
             fs.readFile.mockRejectedValue(new Error("Erro bizarro de leitura"));
 
-            const resultado = await PedidoSalvar.buscarDados();
+            const resultado = await PedidoRepository.buscarDados();
 
             expect(resultado).toEqual([]);
         });
