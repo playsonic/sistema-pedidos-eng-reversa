@@ -1,8 +1,8 @@
-import { Produto } from '../../products/entities/produto.js';
-import { Pedidos } from '../../orders/entities/pedido.js';
-import { PedidoSalvar } from '../repositories/pedidoRepository.js';
-import { CalculadoraDeDesconto } from '../../payments/services/CalculadoraDeDesconto.js'; 
-
+import { Pedidos } from '../entities/pedido.js'; 
+import { Produto } from '../../products/entities/produto.js'; 
+import { PedidoRepository } from '../repositories/pedidoRepository.js'; 
+import { CalculadoraDeDesconto } from '../../payments/services/descontoService.js';
+import { logger } from '../../../shared/utils/logger.js';
 export class PedidoService {
     constructor() {
         this.pedidoAtual = new Pedidos();
@@ -11,23 +11,21 @@ export class PedidoService {
 
     async carregarHistorico() {
         try {
-            const dadosSalvos = await PedidoSalvar.buscarDados();
+            const dadosSalvos = await PedidoRepository.buscarDados();
 
             if (dadosSalvos && dadosSalvos.itens) {
                 this.pedidoAtual.itens = dadosSalvos.itens;
                 this.pedidoAtual.total = dadosSalvos.total;
             }
         } catch (erro) {
-            console.error("Erro ao carregar histórico de pedidos:", erro);
+            logger.erro("Erro ao carregar histórico de pedidos", erro);
         }
     }
 
     async adicionarPedido(categoria, sabor, qtd) {
         let novoItem = Produto.criarProduto(categoria, sabor, qtd);
-
         this.pedidoAtual.adicionarItem(novoItem);
-
-        await PedidoSalvar.salvarDados(this.pedidoAtual);
+        await PedidoRepository.salvarDados(this.pedidoAtual);
     }
 
     obterTotalFinal() {
