@@ -1,4 +1,6 @@
-const API_URL = 'http://localhost:3000';
+import { config } from './linkAPI.js';
+
+
 
 class CarrinhoSubject {
     constructor() {
@@ -18,7 +20,7 @@ const carrinhoSubject = new CarrinhoSubject();
 
 async function atualizarTela() {
     try {
-        const resposta = await fetch(`${API_URL}/pedidos`);
+        let resposta = await fetch(`${config.API_URL}/pedidos`);
 
         if (!resposta.ok) {
             console.error("Erro ao buscar dados da API");
