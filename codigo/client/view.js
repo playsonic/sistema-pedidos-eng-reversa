@@ -86,9 +86,11 @@ async function clickAdicionarPedido() {
     const sabor = obterSaborSelecionado(categoria);
 
     try {
-        const resposta = await fetch(`${API_URL}/pedidos`, {
+        const resposta = await fetch(`${config.API_URL}/finalizar`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'senha123' },
             body: JSON.stringify({
                 produto: categoria,
                 sabor: sabor,
@@ -113,9 +115,11 @@ async function clickFinalizarPedido() {
     const numeroCliente = document.getElementById("numeroCliente")?.value || "";
 
     try {
-        const resposta = await fetch(`${API_URL}/finalizar`, {
+        const resposta = await fetch(`${config.API_URL}/finalizar`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'senha123' },
             body: JSON.stringify({ numeroCliente: numeroCliente })
         });
 
@@ -147,7 +151,12 @@ async function clickFinalizarPedido() {
 
 async function clickRemoverUltimo() {
     try {
-        const resposta = await fetch(`${API_URL}/remover`, { method: 'DELETE' });
+        const resposta = await fetch(`${config.API_URL}/remover`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'senha123' 
+            }
+        });
 
         const retorno = await resposta.json();
 
