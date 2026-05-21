@@ -5,6 +5,7 @@ import cors from 'cors';
 import { envConfig } from './shared/config/env.js';
 import { ordersRouter } from './modules/orders/routes.js';
 import { logger } from './shared/utils/logger.js';
+import { errorHandlerGlobal } from './shared/middlewares/errorHandler.js';
 
 dotenv.config();
 
@@ -20,5 +21,7 @@ app.use(express.json());
 app.use(express.static(path.resolve(__dirname, '../public')));
 
 app.use('/', ordersRouter);
+
+app.use(errorHandlerGlobal);
 
 apapp.listen(PORT, () => {logger.info(`Servidor rodando com sucesso na porta ${PORT}`);});
