@@ -22,8 +22,8 @@ export class Pedidos {
         let taxa = this.total * 0.05;
 
 
-        let valorDoDesconto = estrategiaDeDesconto ? estrategiaDeDesconto(this.total) : 0;
-
+        let valorDoDesconto = estrategiaDeDesconto ? estrategiaDeDesconto.calcular(this.total) : 0;
+        
         return (this.total - valorDoDesconto) + taxa;
     }
 
