@@ -1,14 +1,13 @@
-import { Produto } from '../models/produto.js';
 import { services } from '../services/pedidosService.js';
-import { WhatsappService } from '../services/whatsapp.js';
+import { WhatsappService } from '../../../shared/utils/linkWhatsapp.js';
+import { envConfig } from '../../../shared/config/env.js';
 
-export async function adicionarPedido(req, res) {
+export async function adicionarPedido(req, res, next) {
     const { produto, sabor, quantidade } = req.body;
 
     try {
-        let novoProduto = Produto.criarProduto(produto, sabor, quantidade);
-
-        await services.adicionarPedido(novoProduto);
+        
+        await services.adicionarPedido(produto, sabor, quantidade);
 
         return res.status(201).json({
             mensagem: "Produto adicionado com sucesso!",
@@ -20,7 +19,7 @@ export async function adicionarPedido(req, res) {
     }
 }
 
-export async function finalizarPedido(req, res) {
+export async function finalizarPedido(req, res, next) {
     const { numeroCliente } = req.body;
 
     const listaDeItens = services.pedidoAtual.itens;
@@ -44,7 +43,7 @@ export async function finalizarPedido(req, res) {
         }
 
        
-        let numeroDono = process.env.NUMERO_DONO; 
+        let numeroDono = envConfig.numeroDono;
 
         const mensagemDono = `*NOVO PEDIDO!*\n\n*Itens a preparar:*\n${textoDetalhes}\n*Valor Total: R$ ${totalFinal.toFixed(2)}*\n*Contato do Cliente:* ${numeroCliente || 'Não informado'}`;
         const linkDono = WhatsappService.gerarLinkWaMe(numeroDono, mensagemDono);
@@ -61,11 +60,11 @@ export async function finalizarPedido(req, res) {
         });
 
     } catch (erro) {
-        return res.status(500).json({ erro: erro.message });
+        next(erro);
     }
 }
 
-export async function removerUltimo(req, res) {
+export async function removerUltimo(req, res, next) {
     if (services.pedidoAtual.itens.length === 0) {
         return res.status(400).json({ erro: "Adicione itens ao pedido antes de remover." });
     }
@@ -78,11 +77,11 @@ export async function removerUltimo(req, res) {
             carrinhoAtualizado: services.pedidoAtual.itens
         });
     } catch (erro) {
-        return res.status(500).json({ erro: erro.message });
+        next(erro);
     }
 }
 
-export function buscarPedidoAtual(req, res) {
+export function buscarPedidoAtual(req, res, next) {
     try {
         const itens = services.pedidoAtual.itens;
         const total = services.obterTotalFinal();
@@ -92,6 +91,6 @@ export function buscarPedidoAtual(req, res) {
             total: total
         });
     } catch (erro) {
-        return res.status(500).json({ erro: erro.message });
+        next(erro);
     }
 }
