@@ -2,12 +2,14 @@
  * @jest-environment jsdom
  */
 import { jest } from '@jest/globals';
+
+
 import {
     atualizarTela,
     mostrarOpcoesCorretas,
     obterSaborSelecionado,
     clickAdicionarPedido
-} from '../../src/views/view.js';
+} from '../../client/view.js';
 
 global.fetch = jest.fn();
 global.alert = jest.fn();
@@ -96,12 +98,11 @@ describe('Testes do Front-end (view.js)', () => {
             expect(global.fetch).not.toHaveBeenCalled();
         });
 
-        test('Deve enviar POST para API e Observer deve engatilhar um GET para atualizar a tela', async () => {
+        test('Deve enviar POST para API com a senha de autenticação e atualizar a tela', async () => {
             document.getElementById('categoria').value = 'suco';
             document.getElementById('saboresSuco').value = 'uva';
             document.getElementById('qtd').value = '2';
 
-            
             global.fetch
                 .mockResolvedValueOnce({
                     ok: true,
@@ -119,13 +120,16 @@ describe('Testes do Front-end (view.js)', () => {
 
             expect(global.fetch).toHaveBeenNthCalledWith(1, 'http://localhost:3000/pedidos', expect.objectContaining({
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'senha123'
+                },
                 body: JSON.stringify({ produto: 'suco', sabor: 'uva', quantidade: '2' })
             }));
 
             expect(global.fetch).toHaveBeenNthCalledWith(2, 'http://localhost:3000/pedidos');
 
             expect(document.getElementById('qtd').value).toBe('');
-
             expect(document.getElementById('total').innerText).toBe('4.00');
         });
     });
