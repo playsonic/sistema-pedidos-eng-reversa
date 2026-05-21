@@ -1,11 +1,15 @@
 import { Router } from 'express';
 import { adicionarPedido, finalizarPedido, removerUltimo, buscarPedidoAtual } from './controllers/pedidoController.js';
+import { authMiddlewareFake } from '../../../shared/middlewares/authMiddleware.js';
 
 const ordersRouter = Router();
 
+// Rota publica
 ordersRouter.get('/pedidos', buscarPedidoAtual);
-ordersRouter.post('/pedidos', adicionarPedido);
-ordersRouter.post('/finalizar', finalizarPedido);
-ordersRouter.delete('/remover', removerUltimo);
+
+// Rotas privadas
+ordersRouter.post('/pedidos', authMiddlewareFake, adicionarPedido);
+ordersRouter.post('/finalizar', authMiddlewareFake, finalizarPedido);
+ordersRouter.delete('/remover', authMiddlewareFake, removerUltimo);
 
 export { ordersRouter };
