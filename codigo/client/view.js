@@ -1,7 +1,4 @@
 import { config } from './linkAPI.js';
-
-
-
 class CarrinhoSubject {
     constructor() {
         this.observadores = [];
@@ -86,7 +83,7 @@ async function clickAdicionarPedido() {
     const sabor = obterSaborSelecionado(categoria);
 
     try {
-        const resposta = await fetch(`${config.API_URL}/finalizar`, {
+        const resposta = await fetch(`${config.API_URL}/pedidos`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
