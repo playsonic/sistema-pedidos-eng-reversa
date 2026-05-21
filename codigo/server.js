@@ -7,13 +7,11 @@ import { ordersRouter } from './modules/orders/routes.js';
 import { logger } from './shared/utils/logger.js';
 import { errorHandlerGlobal } from './shared/middlewares/errorHandler.js';
 
-dotenv.config();
+const app = express(); 
+const PORT = envConfig.port; 
 
-let app = express();
-let PORT = envConfig.port; 
-
-let __filename = fileURLToPath(import.meta.url);
-let __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url); 
+const __dirname = path.dirname(__filename); 
 
 app.use(cors());
 app.use(express.json());
@@ -24,4 +22,4 @@ app.use('/', ordersRouter);
 
 app.use(errorHandlerGlobal);
 
-apapp.listen(PORT, () => {logger.info(`Servidor rodando com sucesso na porta ${PORT}`);});
+app.listen(PORT, () => { logger.info(`Servidor rodando com sucesso na porta ${PORT}`);});
