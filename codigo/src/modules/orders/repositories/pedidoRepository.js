@@ -28,7 +28,7 @@ export class PedidoSalvar {
             if (erro.code === 'ENOENT') {
                 return [];
             }
-            console.error("Erro ao ler o arquivo JSON:", erro);
+            logger.erro("Erro ao ler o arquivo JSON:", erro);
             return [];
         }
     }
