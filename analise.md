@@ -11,3 +11,9 @@
 5. Existem responsabilidades misturadas? - Com a refatoração, não mais. Antes, a lógica visual ficava meio misturada com a regra de bloqueio de pedidos, mas agora separamos bem. A View só mostra os dados e pega os cliques, o Controller só roteia, o Service faz a lógica e o Repository salva.
 
 6. O sistema está preparado para crescer? - Sim, do jeito que está agora ele cresce de forma bem mais tranquila. Mas vale ressaltar que se o projeto começar a crescer demais, o padrão MVC vai acabar se tornando muito complicado de se manejar. Se isso acontecer, vai ser necessário fazer ajustes ou até mudar de arquitetura para que ele possa continuar crescendo sem virar uma bola de neve.
+
+---
+
+### Parte 7 – Problemas Arquiteturais
+
+O MVC tradicional apresenta limitações estruturais claras à medida que o projeto escala. Em sistemas de grande porte, os componentes centrais, especificamente os Models e Controllers, tendem a absorver responsabilidades excessivas, resultando em classes infladas e em um alto acoplamento, o que vai na contramão dos objetivos de uma boa arquitetura. Esse acúmulo de funções compromete diretamente a testabilidade, a manutenção e a evolução do software. Além disso, o crescimento desordenado dos arquivos e das dependências torna a navegação entre funções complexa e o fluxo do sistema difícil de rastrear e de fazer manutenção. Portanto, para mitigar essas limitações inerentes ao modelo puro, torna-se indispensável a integração do MVC com outros padrões e práticas arquiteturais.
